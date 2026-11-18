@@ -1,0 +1,16 @@
+interface:
+  display_name: verification loop
+  short_description: Evidence-based verification workflow for Go, Python, shell, Node.js,
+    RPMs, and release bundles, producing a fail-closed PASS/HOLD/FAIL/SKIP ledger.
+    Use after a completed feature, fix, refactor, component, or task, before a PR
+    or release, and when asked to verify, certify, gate, check everything, or assess
+    readiness to ship.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
