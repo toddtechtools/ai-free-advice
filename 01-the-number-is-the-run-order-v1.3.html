@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>The Number Is the Run Order — Ordered Naming Training Guide</title>
+<style>
+:root{
+  --navy:#0E2A47; --teal:#0B7A75; --teal-bright:#12A39B; --teal-soft:#E3F2F1; --red:#B3261E; --red-soft:#FBE9E7;
+  --ink:#14212E; --muted:#4D5D6E; --paper:#F4F6F8; --surface:#FFFFFF; --line:#D5DCE3;
+  --term-bg:#0B1F33; --term-ink:#DCE8F3; --term-dim:#8FA9C4; --ok:#0B7A75; --bad:#B3261E; --warn:#9A6400;
+  --grad:linear-gradient(120deg,#0B7A75 0%,#0E2A47 100%);
+  --shadow-sm:0 1px 2px rgba(14,42,71,.06),0 2px 8px rgba(14,42,71,.06);
+  --shadow-md:0 2px 6px rgba(14,42,71,.08),0 10px 28px rgba(14,42,71,.10);
+  --radius:10px;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#A9C8EC; --teal:#3FC1B8; --teal-bright:#5AD4CB; --teal-soft:#123B39; --red:#FF8A7E; --red-soft:#3A1D1A;
+    --ink:#E3EAF1; --muted:#9FB0C2; --paper:#0B1520; --surface:#12233A; --line:#24405C;
+    --term-bg:#081627; --term-ink:#DCE8F3; --term-dim:#7F98B3; --ok:#3FC1B8; --bad:#FF8A7E; --warn:#E7B34B;
+    --grad:linear-gradient(120deg,#3FC1B8 0%,#A9C8EC 100%);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.35);
+    --shadow-md:0 2px 6px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#A9C8EC; --teal:#3FC1B8; --teal-bright:#5AD4CB; --teal-soft:#123B39; --red:#FF8A7E; --red-soft:#3A1D1A;
+  --ink:#E3EAF1; --muted:#9FB0C2; --paper:#0B1520; --surface:#12233A; --line:#24405C;
+  --term-bg:#081627; --term-ink:#DCE8F3; --term-dim:#7F98B3; --ok:#3FC1B8; --bad:#FF8A7E; --warn:#E7B34B;
+  --grad:linear-gradient(120deg,#3FC1B8 0%,#A9C8EC 100%);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.35);
+  --shadow-md:0 2px 6px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.45);
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+::selection{background:var(--teal);color:#fff}
+a{color:var(--teal)}
+a:hover{color:var(--teal-bright)}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-radius:2px}
+code,pre,kbd{font-family:var(--mono)}
+p code, li code, td code{font-size:.88em;background:var(--teal-soft);color:var(--ink);padding:.08em .35em;border-radius:3px}
+
+/* Scroll progress */
+#progressBar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad);z-index:50;transition:width .08s linear}
+
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1180px;margin:0 auto;gap:56px;padding:0 28px}
+@media (max-width:900px){.layout{grid-template-columns:1fr;gap:0;padding:0 18px}}
+
+/* Rail */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding:40px 0;max-height:100vh;overflow:auto;scrollbar-width:thin}
+.rail h2{font-size:.78rem;font-weight:600;color:var(--muted);margin:0 0 12px;letter-spacing:.08em;text-transform:uppercase}
+.rail ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.rail li a{display:grid;grid-template-columns:30px 1fr;gap:6px;padding:5px 0 5px 12px;margin-left:-2px;border-left:2px solid transparent;text-decoration:none;color:var(--muted);font-size:.9rem;line-height:1.35;transition:color .15s,border-color .15s}
+.rail li a span{font-family:var(--mono);color:var(--teal);font-weight:500}
+.rail li a:hover,.rail li a.active{color:var(--ink);border-left-color:var(--teal)}
+.rail .railnote{margin-top:16px;font-size:.8rem;color:var(--muted);line-height:1.45}
+@media (max-width:900px){.rail{display:none}}
+
+main{min-width:0;padding-bottom:80px}
+
+/* Hero */
+.hero{padding:64px 0 48px;border-bottom:1px solid var(--line);position:relative}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(600px 300px at 85% 0%,rgba(11,122,117,.10),transparent 70%),
+  radial-gradient(500px 260px at 10% 100%,rgba(14,42,71,.08),transparent 70%)}
+.hero>*{position:relative}
+.hero .kicker{font-family:var(--mono);color:var(--teal);font-size:.9rem;margin:0 0 10px}
+.hero h1{font-size:clamp(2.2rem,5.4vw,3.6rem);line-height:1.05;margin:0 0 18px;font-weight:700;letter-spacing:-.02em;max-width:16ch;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .byline{margin:0 0 18px;font-size:.95rem;color:var(--muted);padding-left:12px;border-left:3px solid var(--red)}
+.hero .byline strong{color:var(--navy);font-weight:600}
+.hero .credit{margin-top:14px;color:var(--ink);font-weight:500}
+.hero .lede{font-size:1.15rem;color:var(--muted);max-width:60ch;margin:0 0 28px}
+
+/* Terminal window */
+.term{background:var(--term-bg);color:var(--term-ink);border-radius:var(--radius);padding:0;overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(143,169,196,.18)}
+.term .chrome{display:flex;align-items:center;gap:7px;padding:10px 14px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(143,169,196,.15)}
+.term .dot{width:11px;height:11px;border-radius:50%}
+.term .dot.r{background:#FF5F57}.term .dot.y{background:#FEBC2E}.term .dot.g{background:#28C840}
+.term .title{margin-left:8px;font-family:var(--mono);font-size:.75rem;color:var(--term-dim)}
+.term pre{margin:0;padding:16px 20px;font-family:var(--mono);font-size:.92rem;line-height:1.75;overflow-x:auto}
+.term .p{color:var(--term-dim)}
+.term .n{color:#5FD3C9;font-weight:600}
+.term .c{color:var(--term-dim)}
+.hero .term{max-width:640px}
+.hero-term-row{display:grid;grid-template-columns:24ch minmax(0,1fr);gap:0 18px}
+.hero-term-row .step{white-space:nowrap}
+
+/* Sections */
+section{padding:56px 0 8px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sh{display:flex;align-items:center;gap:16px;margin:0 0 18px}
+.sh .num{font-family:var(--mono);font-size:1.15rem;font-weight:600;color:var(--teal);background:var(--teal-soft);border:1px solid var(--teal);border-radius:8px;padding:8px 10px;line-height:1;min-width:3.4ch;text-align:center}
+.sh h2{margin:0;font-size:clamp(1.45rem,2.6vw,1.9rem);line-height:1.2;color:var(--navy);letter-spacing:-.01em}
+.prose{max-width:68ch}
+.prose p{margin:0 0 1em}
+h3{font-size:1.1rem;color:var(--navy);margin:1.8em 0 .5em}
+
+.rule-box{border:2px solid var(--navy);border-radius:var(--radius);background:var(--surface);overflow:hidden;margin:20px 0;box-shadow:var(--shadow-sm)}
+.rule-box header{background:var(--grad);color:#fff;padding:10px 18px;font-weight:600;letter-spacing:.01em}
+:root[data-theme="dark"] .rule-box header{color:#08121D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rule-box header{color:#08121D}}
+.rule-box ol{margin:0;padding:16px 18px 16px 52px}
+.rule-box li{margin:0 0 10px}
+.rule-box li::marker{font-family:var(--mono);font-weight:600;color:var(--teal)}
+
+pre.code{position:relative;background:var(--term-bg);color:var(--term-ink);padding:16px 18px;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.6;margin:14px 0 20px;box-shadow:var(--shadow-sm);border:1px solid rgba(143,169,196,.15)}
+pre.code .c{color:var(--term-dim)}
+pre.code .k{color:#5FD3C9}
+pre.code .bad{color:#FF8F84}
+
+.callout{border-left:4px solid var(--red);background:var(--red-soft);padding:14px 18px;border-radius:0 8px 8px 0;margin:18px 0}
+.callout.good{border-left-color:var(--teal);background:var(--teal-soft)}
+.callout strong{display:block;margin-bottom:4px}
+.callout p{margin:0 0 .5em}.callout p:last-child{margin:0}
+
+/* Compare panes */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}
+@media (max-width:760px){.compare{grid-template-columns:1fr}}
+.pane{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+.pane:hover{box-shadow:var(--shadow-md)}
+.pane.wrong{border-top:4px solid var(--bad)} .pane.right{border-top:4px solid var(--ok)}
+.pane h3{margin:0;padding:12px 16px;font-size:1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;color:var(--navy)}
+.badge{font-family:var(--mono);font-size:.72rem;padding:3px 9px;border-radius:99px;font-weight:600;letter-spacing:.03em}
+.wrong .badge{background:var(--red-soft);color:var(--red)} .right .badge{background:var(--teal-soft);color:var(--teal)}
+.pane .sub{padding:10px 16px 0;font-size:.85rem;color:var(--muted);margin:0}
+.listing{list-style:none;margin:0;padding:8px 16px 14px;font-family:var(--mono);font-size:.86rem}
+.listing li{display:grid;grid-template-columns:1fr auto;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);align-items:start}
+.listing li:last-child{border-bottom:0}
+.listing .st{font-weight:600;white-space:nowrap}
+.listing .why{grid-column:1/-1;font-family:var(--sans);font-size:.82rem;color:var(--muted);line-height:1.4;display:none}
+.listing.ran .why{display:block}
+.st.ok{color:var(--ok)} .st.bad{color:var(--bad)} .st.warn{color:var(--warn)} .st.skip{color:var(--muted)}
+.pane .verdict{margin-top:auto;padding:12px 16px;border-top:1px solid var(--line);font-size:.9rem;font-weight:500;min-height:3.2em}
+.btn{font-family:var(--sans);font-size:.95rem;font-weight:600;border:2px solid var(--navy);background:var(--navy);color:#fff;padding:9px 16px;border-radius:7px;cursor:pointer;transition:filter .15s,transform .1s}
+:root[data-theme="dark"] .btn{color:#08121D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#08121D}}
+.btn.ghost{background:transparent;color:var(--navy)}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:translateY(1px)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* Decay timeline */
+.decay{list-style:none;margin:24px 0;padding:0;position:relative}
+.decay::before{content:"";position:absolute;left:15px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--teal),var(--red))}
+.decay li{position:relative;padding:0 0 22px 48px}
+.decay li::before{content:"";position:absolute;left:8px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--surface);border:3px solid var(--dot,var(--teal));box-shadow:0 0 0 3px var(--paper)}
+.decay .when{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.decay .what{font-weight:600;color:var(--navy);margin:2px 0 4px}
+.decay p{margin:0;max-width:62ch}
+.decay .cost{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+/* Permutation calculator */
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:24px 0;box-shadow:var(--shadow-sm)}
+.calc label{font-weight:600;display:block;margin-bottom:8px}
+.calc input[type=range]{width:100%;accent-color:var(--teal);height:28px}
+.calc .out{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:560px){.calc .out{grid-template-columns:1fr}}
+.calc .cell{border-radius:8px;padding:14px 16px}
+.calc .cell.w{background:var(--red-soft)} .calc .cell.r{background:var(--teal-soft)}
+.calc .big{font-family:var(--mono);font-size:clamp(1.4rem,3.4vw,2rem);font-weight:600;line-height:1.1;word-break:break-all}
+.calc .w .big{color:var(--red)} .calc .r .big{color:var(--teal)}
+.calc .lbl{font-size:.88rem;color:var(--muted);margin-top:4px}
+
+/* Tables — separate borders so radius renders */
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.94rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--teal-soft);color:var(--navy);font-weight:600}
+tbody tr:nth-child(even){background:rgba(11,122,117,.03)}
+tr:last-child td{border-bottom:0}
+
+/* Patterns */
+.patterns{display:grid;grid-template-columns:1fr;gap:28px;margin-top:10px}
+.pattern h3{margin-top:0}
+
+/* Copy block */
+.copywrap{position:relative}
+.copybtn{position:absolute;top:10px;right:10px;font-family:var(--sans);font-size:.8rem;font-weight:600;border:1px solid var(--term-dim);background:rgba(255,255,255,.06);color:var(--term-ink);padding:4px 10px;border-radius:5px;cursor:pointer}
+.copybtn:hover{background:rgba(255,255,255,.14)}
+
+/* Checklist */
+.checklist{list-style:none;margin:16px 0;padding:0;max-width:68ch}
+.checklist li{border-bottom:1px solid var(--line)}
+.checklist label{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 0;cursor:pointer;align-items:start;border-radius:6px;transition:background .15s}
+.checklist label:hover{background:rgba(11,122,117,.05)}
+.checklist input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--teal);cursor:pointer}
+.checklist input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--teal)}
+.progress{font-family:var(--mono);font-size:.9rem;color:var(--teal);font-weight:600}
+.progress.done{color:var(--ok)}
+
+footer{padding:40px 0;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+.theme-toggle{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;font-size:.8rem;padding:6px 12px;box-shadow:var(--shadow-sm)}
+@media print{.rail,.theme-toggle,.btn,.copybtn,#progressBar{display:none!important}.layout{display:block}.listing .why{display:block}}
+</style>
+</head>
+<body>
+<div id="progressBar" aria-hidden="true"></div>
+<button class="btn ghost theme-toggle" id="themeToggle" type="button" aria-label="Toggle light or dark theme">Theme</button>
+
+<div class="layout">
+  <nav class="rail" aria-label="Guide sections">
+    <h2>Run order</h2>
+    <ol id="railList">
+      <li><a href="#s00"><span>00</span>Why order is the contract</a></li>
+      <li><a href="#s01"><span>01</span>The core rule</a></li>
+      <li><a href="#s02"><span>02</span>Wrong way vs. right way</a></li>
+      <li><a href="#s03"><span>03</span>How problems expand</a></li>
+      <li><a href="#s04"><span>04</span>The zero-padding trap</a></li>
+      <li><a href="#s05"><span>05</span>The solution: four patterns</a></li>
+      <li><a href="#s06"><span>06</span>Runner traps to avoid</a></li>
+      <li><a href="#s07"><span>07</span>Inserting a step</a></li>
+      <li><a href="#s08"><span>08</span>Order across all work</a></li>
+      <li><a href="#s09"><span>09</span>Split at 80</a></li>
+      <li><a href="#s10"><span>10</span>Stable identity</a></li>
+      <li><a href="#s11"><span>11</span>Guardrails</a></li>
+      <li><a href="#s12"><span>12</span>Paste-in instruction block</a></li>
+      <li><a href="#s13"><span>13</span>Hand-off checklist</a></li>
+    </ol>
+    <p class="railnote">This guide follows its own rule: read the sections in numeric order.</p>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <p class="kicker">Ordered naming &amp; runtime sequence — training guide · v1.3 · 17 November 2026</p>
+      <h1>The filesystem is the runbook.</h1>
+      <p class="byline">Designed by <strong>Todd M. Ochsenbein</strong>, CTO @ RedIron Technologies</p>
+      <p class="lede">When the number in a filename is the execution order, a colleague or a fresh AI session can recover the declared sequence by sorting the files. The README records prerequisites and recovery steps, the runner validates the sequence, and the final verify step checks the result.</p>
+      <div class="term" aria-label="Terminal showing the sorted deployment directory, with the pipeline, manual rollback, and runner identified">
+        <div class="chrome"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">deploy — sorted directory</span></div>
+        <pre><span class="p">$</span> ls -1 deploy/ | LC_ALL=C sort
+<span class="hero-term-row"><span class="step"><span class="n">00</span>-README.md</span><span class="c"># read first</span></span>
+<span class="hero-term-row"><span class="step"><span class="n">00</span>-check-prereqs.sh</span><span class="c"># runs first</span></span>
+<span class="hero-term-row"><span class="step"><span class="n">01</span>-create-dirs.sh</span><span class="c"></span></span>
+<span class="hero-term-row"><span class="step"><span class="n">02</span>-install-packages.sh</span><span class="c"></span></span>
+<span class="hero-term-row"><span class="step"><span class="n">03</span>-configure-podman.sh</span><span class="c"></span></span>
+<span class="hero-term-row"><span class="step"><span class="n">04</span>-write-quadlets.sh</span><span class="c"></span></span>
+<span class="hero-term-row"><span class="step"><span class="n">05</span>-start-services.sh</span><span class="c"></span></span>
+<span class="hero-term-row"><span class="step"><span class="n">06</span>-verify.sh</span><span class="c"># hand-off gate</span></span>
+<span class="hero-term-row"><span class="step"><span class="n">99</span>-rollback.sh</span><span class="c"># manual only</span></span>
+<span class="hero-term-row"><span class="step">run-all.sh</span><span class="c"># entry point</span></span></pre>
+      </div>
+    </header>
+
+    <!-- 00 -->
+    <section id="s00">
+      <div class="sh"><span class="num">00</span><h2>Why order is the contract</h2></div>
+      <div class="prose">
+        <p>A multi-step procedure has two parts: the steps, and the order of the steps. Most teams write down the first and keep the second in someone’s head. That works right up until the person — or the AI session — that holds the order is gone.</p>
+        <p>Putting the run order into the filename moves it out of anyone’s head and into a visible, mechanically checkable place: the directory listing. The prefix stops being decoration and becomes a contract.</p>
+        <div class="callout">
+          <strong>If the prefix is only cosmetic</strong>
+          <p>Humans and other AIs still have to guess the sequence. A number that “roughly” suggests order is worse than no number, because it looks trustworthy.</p>
+        </div>
+        <div class="callout good">
+          <strong>When the number is the execution order</strong>
+          <p>Sorting the files reproduces the workflow exactly. The work survives AI downtime, model changes, staff changes, and your own memory.</p>
+        </div>
+        <p>Who this protects:</p>
+        <ul>
+          <li><strong>You, later.</strong> Three months from now you won’t remember whether <code>fix-podman.sh</code> runs before or after <code>configure.sh</code>.</li>
+          <li><strong>A colleague on call.</strong> At 2 a.m. they need to re-run the deploy, not reverse-engineer it.</li>
+          <li><strong>Another AI model.</strong> A new session has no conversation history. It can read the README, inspect the declared sequence, and use the same runner a teammate would use.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 01 -->
+    <section id="s01">
+      <div class="sh"><span class="num">01</span><h2>The core rule</h2></div>
+      <div class="rule-box">
+        <header>Naming + runtime order (mandatory)</header>
+        <ol start="0">
+          <li>Every sequenced script, playbook step, or ordered artifact uses a zero-padded prefix: <code>00-…</code>, <code>01-…</code>, <code>02-…</code>, <code>03-…</code></li>
+          <li><strong>For scripts, the number is the execution order.</strong> 00 runs first, then 01, then 02. For goals, projects, and documents, it defines presentation, portfolio, or reading order; dependencies are recorded separately. Never create a script that must run before a lower number or after a higher number without renaming.</li>
+          <li>A human or another AI must be able to read the sequence from the filenames, find prerequisites and recovery steps in the README, and execute the pipeline through the runner.</li>
+          <li>Before writing any files, output a short ordered plan (number + one-line purpose). Then create exactly those names.</li>
+        </ol>
+      </div>
+      <pre class="code"><span class="c"># Inspect the declared pipeline order from inside the collection:</span>
+printf '%s\n' [0-8][0-9]-*.sh | LC_ALL=C sort</pre>
+      <div class="prose">
+        <p>Use this listing to inspect the order. Use the runner to validate and execute the pipeline. The README is a document index, so it may share 00 with the first executable step; two executable steps may never share a number.</p>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section id="s02">
+      <div class="sh"><span class="num">02</span><h2>Wrong way vs. right way</h2></div>
+      <div class="prose">
+        <p>Both directories below deploy the same Podman + Quadlet stack. The wrong one was built up over a few weeks by someone who knew the order. The right one encodes it. This is a scripted illustration, not an actual host test. Press the button to simulate a <strong>cold hand-off</strong>: a new person or AI sorts the files and runs them top to bottom.</p>
+      </div>
+      <div class="btn-row" style="margin:18px 0 0">
+        <button class="btn" id="simBtn" type="button">Simulate a cold hand-off</button>
+        <button class="btn ghost" id="simReset" type="button">Reset</button>
+      </div>
+      <div class="compare">
+        <div class="pane wrong">
+          <h3><span class="badge">Wrong</span> deploy/ (as sorted)</h3>
+          <p class="sub">Names describe what, never when.</p>
+          <ul class="listing" id="wrongList"></ul>
+          <div class="verdict" id="wrongVerdict" aria-live="polite">Not yet run.</div>
+        </div>
+        <div class="pane right">
+          <h3><span class="badge">Right</span> deploy/ (as sorted)</h3>
+          <p class="sub">The prefix is the schedule.</p>
+          <ul class="listing" id="rightList"></ul>
+          <div class="verdict" id="rightVerdict" aria-live="polite">Not yet run.</div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>The author of the wrong directory would have run <code>setup → install → install2 → fix-podman → configure → start → verify → final</code>, and skipped <code>helper.sh</code> because it’s sourced, not run. None of that is written anywhere. Alphabetical sort puts <code>configure.sh</code> first, before anything is installed.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="s03">
+      <div class="sh"><span class="num">03</span><h2>How problems expand without order</h2></div>
+      <div class="prose">
+        <p>Missing order doesn’t fail once and stay put. Each new unnumbered file adds ambiguity on top of the existing ambiguity, and the cost lands on whoever touches it next.</p>
+      </div>
+      <ol class="decay">
+        <li style="--dot:var(--teal)">
+          <div class="when">Day 1</div>
+          <div class="what">Five scripts, one author, everything works</div>
+          <p>The author runs them in the right order from memory. No problem is visible yet, which is why the habit takes hold.</p>
+        </li>
+        <li style="--dot:#4C8F8A">
+          <div class="when">Week 2</div>
+          <div class="what"><code>fix-podman.sh</code> is added</div>
+          <p>It must run between install and configure. Only the author knows that. The order now lives in one head.</p>
+          <span class="cost">orderings to guess: 6! = 720</span>
+        </li>
+        <li style="--dot:#8A7A3C">
+          <div class="when">Month 2</div>
+          <div class="what"><code>install2.sh</code> and <code>helper.sh</code> appear</div>
+          <p>Is <code>install2</code> a replacement or an addition? Is <code>helper</code> run or sourced? Nobody can tell from the names, and the AI session that wrote them has ended.</p>
+          <span class="cost">orderings to guess: 8! = 40,320 — plus “which ones run at all?”</span>
+        </li>
+        <li style="--dot:#A3522C">
+          <div class="when">Hand-off</div>
+          <div class="what">A colleague or new AI sorts and runs</div>
+          <p>Configure runs before install. It fails partway, leaving a half-configured host. They retry, re-running non-idempotent steps. The host now differs from every other host.</p>
+          <span class="cost">cost: a broken host plus configuration drift</span>
+        </li>
+        <li style="--dot:var(--red)">
+          <div class="when">Incident</div>
+          <div class="what">Nobody can reproduce or roll back</div>
+          <p>Rollback has to undo steps in reverse order — an order no one recorded. The fix becomes archaeology: reading shell history, old chats, and timestamps. The cost is no longer a failed run; it’s lost trust in the whole procedure.</p>
+          <span class="cost">cost: time, trust, and a postmortem</span>
+        </li>
+      </ol>
+
+      <div class="calc">
+        <label for="nRange">Steps in the procedure: <span id="nVal" class="progress">8</span></label>
+        <input type="range" id="nRange" min="2" max="20" value="8" aria-describedby="calcNote">
+        <div class="out">
+          <div class="cell w">
+            <div class="big" id="wrongCount">40,320</div>
+            <div class="lbl">possible orders when names carry no sequence</div>
+          </div>
+          <div class="cell r">
+            <div class="big">1</div>
+            <div class="lbl">possible order when the number is the run order</div>
+          </div>
+        </div>
+        <p id="calcNote" style="margin:14px 0 0;font-size:.9rem;color:var(--muted)">Without numbers, n steps have n! possible permutations (n × (n−1) × … × 1). This is a mathematical upper bound on arrangements, not a measured failure rate: dependencies may allow several valid orders, and documentation can resolve ambiguity. Numbering selects one declared sequence; it does not prove the sequence or the scripts are correct.</p>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section id="s04">
+      <div class="sh"><span class="num">04</span><h2>The zero-padding trap</h2></div>
+      <div class="prose">
+        <p>Numbers without padding sort as text, not as numbers. Once you pass nine steps, the order silently breaks.</p>
+      </div>
+      <div class="compare">
+        <div class="pane wrong">
+          <h3><span class="badge">Unpadded</span> ls | sort</h3>
+          <ul class="listing ran">
+            <li><span>1-check-prereqs.sh</span><span class="st ok">1st</span></li>
+            <li><span>10-verify.sh</span><span class="st bad">2nd?!</span><span class="why">Verify runs before anything is installed.</span></li>
+            <li><span>11-rollback.sh</span><span class="st bad">3rd?!</span><span class="why">Rollback runs third, in the middle of a deploy.</span></li>
+            <li><span>2-create-dirs.sh</span><span class="st warn">4th</span></li>
+            <li><span>3-install-packages.sh</span><span class="st warn">5th</span></li>
+            <li><span>…</span><span class="st skip"></span></li>
+          </ul>
+        </div>
+        <div class="pane right">
+          <h3><span class="badge">Zero-padded</span> ls | sort</h3>
+          <ul class="listing ran">
+            <li><span>01-check-prereqs.sh</span><span class="st ok">1st</span></li>
+            <li><span>02-create-dirs.sh</span><span class="st ok">2nd</span></li>
+            <li><span>03-install-packages.sh</span><span class="st ok">3rd</span></li>
+            <li><span>…</span><span class="st skip"></span></li>
+            <li><span>10-verify.sh</span><span class="st ok">10th</span></li>
+            <li><span>99-rollback.sh</span><span class="st skip">manual</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="prose">
+        <p><strong>Split before planned growth would exceed prefix 80.</strong> Zero-based 00–80 provides 81 positions. Steps 81–89 are executable by the runner, but they are not planned capacity — a collection that reaches them has already outgrown itself and should have split. Keep 90–99 manual-only for executable collections. Never add 100 to a two-digit collection: it sorts before 11. See section 09 for capacity and split rules.</p>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section id="s05">
+      <div class="sh"><span class="num">05</span><h2>The solution: four patterns that survive AI downtime</h2></div>
+      <div class="patterns">
+        <div class="pattern prose">
+          <h3>One directory is one linear pipeline</h3>
+          <p>A directory holds exactly one sequence. If you have deploy and backup procedures, they live in separate directories, each starting at 00.</p>
+<pre class="code">deploy/
+  00-README.md            <span class="c"># run order + purpose of each step (read first)</span>
+  00-check-prereqs.sh     <span class="c"># podman, cgroup v2, SELinux</span>
+  01-create-dirs.sh
+  02-install-packages.sh
+  03-configure-podman.sh
+  04-write-quadlets.sh
+  05-start-services.sh
+  06-verify.sh            <span class="c"># exits non-zero on failure: hand-off gate</span>
+  99-rollback.sh          <span class="c"># manual only; never run by the runner</span>
+  run-all.sh              <span class="c"># the one unnumbered entry point</span></pre>
+        </div>
+
+        <div class="pattern prose">
+          <h3>An explicit runner, so nobody has to remember</h3>
+          <p>Any multi-step script set ships with a runner that executes the steps in sorted order and stops on the first failure. Before executing a step, the runner checks for the README and validates top-level shell-script filenames, regular executable files, unique prefixes, a contiguous pipeline from 00, and a final verify filename. A gap or duplicate from a partial renumber blocks execution. Review the README and verification logic to confirm the intended sequence and outcome. See section 06 for why it’s named <code>run-all.sh</code> rather than <code>00-run-all.sh</code>.</p>
+<pre class="code">#!/usr/bin/env bash
+# run-all.sh — validate first; run only 00–89, never manual 90–99.
+set -euo pipefail
+export LC_ALL=C
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+unset GLOBIGNORE GLOBSORT
+set +f
+shopt -u failglob nocaseglob nocasematch
+shopt -s nullglob dotglob
+fail() { printf 'run-all: %s\n' "$*" &gt;&amp;2; exit 1; }
+[[ -f 00-README.md ]] || fail 'missing 00-README.md'
+# Reject stray scripts, invalid names, symlinks, and duplicate prefixes.
+declare -A seen=()
+for f in *.sh; do
+  [[ $f == run-all.sh ]] &amp;&amp; continue
+  [[ $f =~ ^([0-9]{2})-[a-z0-9]+(-[a-z0-9]+)*\.sh$ ]] || fail "invalid step: $f"
+  prefix=${BASH_REMATCH[1]}
+  [[ ! -L $f &amp;&amp; -f $f &amp;&amp; -x $f ]] || fail "not a regular executable: $f"
+  [[ ! ${seen[$prefix]+present} ]] || fail "duplicate prefix: $prefix"
+  seen[$prefix]=1
+done
+steps=( [0-8][0-9]-*.sh )
+(( ${#steps[@]} &gt; 0 )) || fail 'no pipeline steps found'
+for i in "${!steps[@]}"; do
+  f=${steps[$i]}
+  prefix=${f%%-*}
+  (( 10#$prefix == i )) || fail "gap: expected position $i, found $f"
+done
+last=${steps[${#steps[@]}-1]}
+[[ $last =~ ^[0-8][0-9]-verify\.sh$ ]] || fail 'last step must be NN-verify.sh'
+for f in "${steps[@]}"; do
+  printf 'Running %s\n' "$f"
+  "./$f"
+done
+printf 'All %s pipeline steps passed.\n' "${#steps[@]}"
+</pre>
+        </div>
+
+        <div class="pattern prose">
+          <h3>Dependencies only flow forward</h3>
+          <p><code>03</code> may depend on results from <code>01</code> and <code>02</code> after the runner completes them successfully. It must not call earlier steps to repeat them implicitly. A standalone invocation must check its prerequisites; ordering is not evidence that a previous run happened. <code>01</code> must never require <code>03</code>. If a later step turns out to be needed earlier, renumber the whole set (section 07). Never leave an out-of-order name in place with a comment saying “run this first.”</p>
+        </div>
+
+        <div class="pattern prose">
+          <h3>Document the order in a 00 file</h3>
+          <p>The filenames carry the order; <code>00-README.md</code> carries the why. It is the explicit read-first index. Under C sorting, uppercase README sorts before lowercase step names sharing 00.</p>
+<pre class="code">00-README.md
+
+Run order (execute ./run-all.sh):
+  00-check-prereqs.sh    – verifies podman, cgroup v2, SELinux enforcing
+  01-create-dirs.sh      – creates ~/.config/containers/systemd and data dirs
+  02-install-packages.sh – dnf installs pinned packages
+  03-configure-podman.sh – rootless storage + registries
+  04-write-quadlets.sh   – writes .container/.network units
+  05-start-services.sh   – reload systemd and start the generated units
+  06-verify.sh           – must pass before hand-off
+
+Manual only:
+  99-rollback.sh         – stops units, removes quadlets (reverse of 05→04)</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="s06">
+      <div class="sh"><span class="num">06</span><h2>Runner traps to avoid</h2></div>
+      <div class="prose">
+        <p>The obvious runner — loop over <code>[0-9][0-9]-*.sh</code> — has several failure modes that show up the first time someone uses it for real.</p>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Trap</th><th>What happens</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Runner named <code>00-run-all.sh</code></td><td>It matches its own glob and calls itself, forever. It also shares <code>00</code> with <code>00-check-prereqs.sh</code>, so two files claim “first.”</td><td>Name it <code>run-all.sh</code>: the one allowed unnumbered entry point, outside the pattern.</td></tr>
+            <tr><td><code>99-rollback.sh</code> in the same glob</td><td>Every successful deploy ends by rolling itself back.</td><td>Reserve 90–99 for manual operations; the runner globs <code>[0-8][0-9]-*.sh</code>.</td></tr>
+            <tr><td>Sort depends on locale</td><td>Some locales ignore punctuation or fold case when sorting, so two hosts can order the same files differently.</td><td><code>export LC_ALL=C</code> in the runner for byte-order sorting everywhere.</td></tr>
+            <tr><td>Spaces or odd characters in names</td><td><code>for f in $(ls …)</code> splits <code>02-install packages.sh</code> into two words.</td><td>Lowercase, hyphens, no spaces. Iterate a glob array, not <code>$(ls)</code>.</td></tr>
+            <tr><td>Octal arithmetic on <code>08</code>/<code>09</code></td><td>Bash reads a leading zero as octal: <code>$((08+1))</code> is an error.</td><td>Force base 10: <code>$((10#$n + 1))</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section id="s07">
+      <div class="sh"><span class="num">07</span><h2>Inserting a step</h2></div>
+      <div class="prose">
+        <p>You need a firewall step between <code>02-install-packages.sh</code> and <code>03-configure-podman.sh</code>. The tempting shortcuts all break the contract.</p>
+      </div>
+      <div class="compare">
+        <div class="pane wrong">
+          <h3><span class="badge">Wrong</span> patch it in</h3>
+          <ul class="listing ran">
+            <li><span>02-install-packages.sh</span><span class="st skip"></span></li>
+            <li><span>02a-firewall.sh</span><span class="st bad">✗</span><span class="why">A numbered glob alone skips it. The guide’s runner rejects it during validation.</span></li>
+            <li><span>02.5-firewall.sh</span><span class="st bad">✗</span><span class="why">Same problem, and the decimal invites 02.25 next month.</span></li>
+            <li><span>03-firewall.sh</span><span class="st bad">✗</span><span class="why">Collides with 03-configure-podman.sh; filename suffixes determine which 03 runs first, rather than an explicit step position.</span></li>
+            <li><span>firewall.sh  <span style="color:var(--muted)"># run after 02!</span></span><span class="st bad">✗</span><span class="why">The order is back in a comment — tribal knowledge again.</span></li>
+          </ul>
+        </div>
+        <div class="pane right">
+          <h3><span class="badge">Right</span> renumber everything after it</h3>
+          <ul class="listing ran">
+            <li><span>02-install-packages.sh</span><span class="st ok">same</span></li>
+            <li><span>03-configure-firewall.sh</span><span class="st ok">new</span></li>
+            <li><span>04-configure-podman.sh</span><span class="st warn">was 03</span></li>
+            <li><span>05-write-quadlets.sh</span><span class="st warn">was 04</span></li>
+            <li><span>06-start-services.sh</span><span class="st warn">was 05</span></li>
+            <li><span>07-verify.sh</span><span class="st warn">was 06</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Renumber from the highest file downward so nothing gets overwritten. Use <code>git mv</code> to stage each rename and update <code>00-README.md</code> in the same commit. Revalidate the complete collection before running it. The runner detects visible gaps and duplicates, and a reviewed change keeps the scripts and references in sync.</p>
+      </div>
+      <div class="callout good prose"><strong>Renumber as a reviewed change</strong><ol><li>Inspect the entire collection and plan every source → destination rename before changing anything.</li><li>If planned growth crosses 80, split first (section 09) — do not cross into 90–99.</li><li>Use <code>git mv</code>, highest number first, then create the new step with a two-digit prefix.</li><li>Update <code>00-README.md</code>, links, tests, configuration, and every filename reference in the same change.</li><li>Keep permanent IDs unchanged and revalidate the complete sequence.</li></ol><p>When adding work to an existing pipeline, insert it before the final verify step and move verification forward. “Continue from the highest number” applies within the same collection and range; a manual 99 does not determine the next pipeline number.</p></div>
+    </section>
+
+    <!-- 08 -->
+    <section id="s08">
+      <div class="sh"><span class="num">08</span><h2>One convention across all work</h2></div>
+      <div class="prose">
+        <p>Use two-digit, lowercase, hyphen-separated names within each collection. Each folder owns its numbering; there is no single global sequence. Existing collections continue their sequence; a genuinely new child collection starts its own sequence.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Object</th><th>Example</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>Goal</td><td><code>01-repeatable-delivery.md</code></td><td>Presentation or priority order</td></tr>
+              <tr><td>Project</td><td><code>02-agent-execution/</code></td><td>Portfolio order</td></tr>
+              <tr><td>Phase</td><td><code>03-agents-and-skills/</code></td><td>Planned delivery order; dependencies explicit</td></tr>
+              <tr><td>Document</td><td><code>04-design-overview.html</code></td><td>Reading order</td></tr>
+              <tr><td>Pipeline step</td><td><code>04-validate-runtime.sh</code></td><td>Mandatory runtime order</td></tr>
+              <tr><td>Manual script</td><td><code>99-rollback.sh</code></td><td>Manual only; never automatic</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Replace mixed display labels such as P0 and G1 with a clearly named collection and zero-padded display positions. A goal numbered 02 does not automatically depend on goal 01.</p>
+        <p>Every collection has <code>00-README.md</code>. Document and folder entries normally start at 01 because 00 is the index. Executable steps start at 00: script and document numbering are separate scopes. Keep tool-required filenames such as <code>AGENTS.md</code> and <code>SKILL.md</code> intact and list them in the index; keep source modules and third-party assets in their appropriate directories rather than numbering code symbols or vendor files.</p>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section id="s09">
+      <div class="sh"><span class="num">09</span><h2>Split at 80: the math and operation</h2></div>
+      <div class="prose">
+        <p><strong>Split before a collection’s planned sequence would exceed 80.</strong> This threshold concerns the highest planned prefix, not “80 files.” Split into meaningful stages instead of arbitrary buckets of 80.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Range</th><th>Capacity</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td>00–80</td><td>81 positions</td><td>Normal pipeline planning, including final verification</td></tr>
+              <tr><td>01–80</td><td>80 entries</td><td>Documents or folders, plus their 00 index</td></tr>
+              <tr><td>81–89</td><td>9 positions</td><td>Executable, but never planned — reaching them means the split is overdue</td></tr>
+              <tr><td>90–99</td><td>10 positions</td><td>Manual operations in script collections; excluded from runners</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The executable address space is 00–89 (90 steps). The planning limit is deliberately lower; 81–89 are a warning signal, not spare room to budget against. Two-digit non-executable collections also split at 80; do not treat 90–99 as a second tranche of planned documentation.</p>
+<pre class="code">02-pipeline/
+  00-README.md
+  run-all.sh
+  00-prepare.sh       # invokes 01-prepare/run-all.sh
+  01-deploy.sh        # invokes 02-deploy/run-all.sh
+  02-verify.sh        # verifies the integrated result
+  99-rollback.sh      # manual; documents scope and reversal order
+  01-prepare/
+    00-README.md
+    run-all.sh
+    00-preflight.sh
+    01-prepare-workspace.sh
+    02-verify.sh
+  02-deploy/
+    00-README.md
+    run-all.sh
+    00-configure.sh
+    01-start-services.sh
+    02-verify.sh</pre>
+        <p>Parent numbered steps invoke child runners synchronously and propagate any non-zero exit. Each child finishes and verifies before a dependent stage starts. Each directory has exactly one runner for its own executable collection. Never recursively glob the whole tree, run children twice, or require a later sibling to prepare an earlier one. The parent README records the complete stage order and links each child README.</p>
+        <p><strong>Insertion cost:</strong> with n steps numbered from 0, insertion before position p renames n − p existing files. Inserting before 05 in 00–19 moves 15 files. If all n + 1 insertion positions are equally likely, the average is n/2 renames. Keep collections small and permanent references independent of these positions.</p>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <div class="sh"><span class="num">10</span><h2>Stable identity, changeable order</h2></div>
+      <div class="prose">
+        <p>A filename prefix describes where an item sits today. A permanent ID identifies the same item throughout its life. Store IDs in document metadata or an index; scope them to the program and never reuse retired IDs.</p>
+<pre class="code">filename: 01-repeatable-delivery.md
+id: GOAL-000017
+order: 01
+title: Repeatable delivery
+
+# After reordering:
+filename: 04-repeatable-delivery.md
+id: GOAL-000017
+order: 04</pre>
+        <p>Use permanent IDs in acceptance criteria, dependency records, and audit evidence. Use paths for navigation; update those links whenever paths change. If order metadata is present, validate it against the filename rather than maintaining two conflicting orders. This is a naming convention, not a requirement to add a database or new service.</p>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <div class="sh"><span class="num">11</span><h2>Guardrails</h2></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Continue the existing collection; insert new work before final verification. Ignore manual 9x when calculating pipeline positions. New child collections start fresh.</td><td>Stops collisions and silent reordering when a new session adds steps.</td></tr>
+            <tr><td>To insert a step, renumber everything after it.</td><td>Keeps the sequence honest; no <code>02a</code>, no decimals, no duplicates.</td></tr>
+            <tr><td>Make steps idempotent where possible; document any step that is unsafe to repeat and its recovery prerequisites.</td><td>Someone restarting midway shouldn’t make things worse.</td></tr>
+            <tr><td>The last pipeline step is NN-verify.sh and exits non-zero on failure; manual 9x files are outside that sequence.</td><td>Gives a clear, mechanical hand-off gate.</td></tr>
+            <tr><td>No <code>final.sh</code>, <code>do_it.sh</code>, <code>helper.sh</code>, <code>utils.sh</code> inside a numbered pipeline.</td><td>Names without a position create ambiguity. Shared code goes in <code>lib/</code> and is sourced.</td></tr>
+            <tr><td>90–99 reserved for manual operations (rollback, teardown).</td><td>Keeps them visible and ordered without the runner executing them.</td></tr>
+            <tr><td>Exactly one unnumbered entry point per executable collection: <code>run-all.sh</code>.</td><td>Avoids self-recursion and a duplicate 00.</td></tr>
+            <tr><td>Lowercase, hyphen-separated names, no spaces.</td><td>Safe for globbing, sorting, and copy-paste on any host.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <div class="sh"><span class="num">12</span><h2>Paste-in instruction block</h2></div>
+      <div class="prose">
+        <p>Drop this into a skill, <code>AGENTS.md</code>, or any system prompt. It’s written so a model with no prior context can follow it.</p>
+      </div>
+      <div class="copywrap">
+        <button class="copybtn" type="button" data-copy="agentsBlock">Copy</button>
+<pre class="code" id="agentsBlock">## Ordered work, naming &amp; runtime sequence (NON-NEGOTIABLE)
+
+- Apply scoped two-digit ordering to goals, projects, phases, documents,
+  and executable procedures. Use lowercase hyphen-separated names; no spaces.
+- Each folder owns its collection and has 00-README.md. Document/folder
+  entries start at 01; executable steps start at 00 (separate scopes).
+- Preserve tool-required filenames such as AGENTS.md and SKILL.md;
+  list these exceptions in the index. Shared shell code lives in lib/.
+- Within each ordered collection: unique, contiguous numeric positions;
+  no 02a, decimals, mixed widths, duplicate executable prefixes, or hidden gaps.
+- Split before planned growth would exceed prefix 80. 00–80 means
+  81 positions; 01–80 means 80 entries. Do not treat 81–89 as spare
+  capacity. Never extend to 100.
+- 00–89 are executable pipeline positions; 90–99 are manual-only
+  operations and are never executed by the runner.
+- For scripts, LC_ALL=C filename order MUST equal runtime order.
+  For goals/projects/documents, order is presentation/reading order;
+  dependencies must be recorded separately.
+- Each executable collection has exactly one unnumbered run-all.sh:
+  set -euo pipefail; export LC_ALL=C; validate the entire direct-child
+  script set before any step runs; reject invalid names, duplicate
+  prefixes, gaps, symlinks, non-executable steps, empty pipelines,
+  and a missing final NN-verify.sh; execute sorted [0-8][0-9]-*.sh;
+  stop on first failure; never execute itself or manual 9x scripts.
+- A step may depend only on lower-numbered steps. It does not silently
+  re-run them; standalone execution checks prerequisite state.
+- Existing collections continue their sequence, not a new 00. Insert
+  added work before the existing final verify step. Manual 99 does
+  not determine the next pipeline number.
+- Before insertion, plan all renames. Use git mv highest first, then
+  update the README, links, tests, configs, and filename references.
+  A gapped collection must never execute; the fail-closed runner
+  refuses to run mid-renumber.
+- Split by meaningful stages: numbered parent steps invoke child
+  runners synchronously and propagate failures. Each child has its own
+  README and final verification; the parent ends with integration
+  verification. No recursive global glob or duplicated child execution.
+- Keep permanent IDs unchanged during moves or renumbering; never reuse
+  retired IDs. Use IDs for traceability and paths for navigation.
+- The README lists ordered entries, purposes, dependencies, manual
+  operations, exceptions, and child procedures. A stranger must recover
+  the complete procedure without any prior conversation.
+- When creating multiple steps: first list exact filenames and one-line
+  purposes in order; then create exactly those names.
+- No final.sh, do_it.sh, helper.sh, or utils.sh as pipeline steps.
+- Verification must fail non-zero on any failed required check. Missing
+  evidence is NOT EXECUTED/HOLD, never PASS. A numbered name, mock run,
+  or successful syntax check alone does not prove host readiness.</pre>
+      </div>
+      <div class="prose">
+        <h3>What a compliant response looks like</h3>
+      </div>
+<pre class="code">Plan:
+  00-check-prereqs.sh     – podman, cgroup v2, SELinux
+  01-create-dirs.sh       – quadlet + data directories
+  02-write-quadlets.sh    – .container and .network units
+  03-reload-and-start.sh  – reload systemd and start the generated units
+  04-verify.sh            – health checks; exits non-zero on failure
+  99-rollback.sh          – manual: stop units, remove quadlets
+  run-all.sh              – runs 00–04 in sorted order
+  00-README.md            – this list
+
+<span class="c">[then creates exactly those eight files, nothing more, nothing renamed]</span></pre>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <div class="sh"><span class="num">13</span><h2>Hand-off checklist</h2></div>
+      <div class="prose">
+        <p>Run through this before calling a script set done. <span class="progress" id="progress" aria-live="polite">0 of 12 complete</span></p>
+      </div>
+      <ul class="checklist" id="checklist">
+        <li><label><input type="checkbox"><span>Every step file matches <code>NN-lowercase-name.sh</code> with a two-digit prefix.</span></label></li>
+        <li><label><input type="checkbox"><span><code>printf '%s\n' [0-8][0-9]-*.sh | LC_ALL=C sort</code> lists only pipeline steps in the exact order they must run.</span></label></li>
+        <li><label><input type="checkbox"><span>No duplicate executable prefixes, no gaps that hide a removed step, no <code>02a</code> or decimals.</span></label></li>
+        <li><label><input type="checkbox"><span>No step depends on a higher-numbered step.</span></label></li>
+        <li><label><input type="checkbox"><span><code>run-all.sh</code> exists, runs only 00–89, and stops on the first failure.</span></label></li>
+        <li><label><input type="checkbox"><span>Manual operations live in 90–99 and are listed in the README.</span></label></li>
+        <li><label><input type="checkbox"><span><code>00-README.md</code> lists every file in order with a one-line purpose.</span></label></li>
+        <li><label><input type="checkbox"><span>Verification evidence identifies the tested candidate and environment; unavailable host checks remain NOT EXECUTED/HOLD.</span></label></li>
+        <li><label><input type="checkbox"><span>Planned prefixes stay at or below 80, with a documented split plan before the collection approaches the limit.</span></label></li>
+        <li><label><input type="checkbox"><span>Each child has its own README, runner, and final verification; parent steps propagate failures and verify integration.</span></label></li>
+        <li><label><input type="checkbox"><span>Stable IDs survived reordering; links and filename references were updated.</span></label></li>
+        <li><label><input type="checkbox"><span>The runner rejects malformed sequences before executing the first step; the README matches the complete procedure.</span></label></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>The filenames record the order, the README explains how to operate the pipeline, and verification records whether it’s ready for handoff.</p>
+      <p class="credit">Designed by Todd M. Ochsenbein, CTO @ RedIron Technologies</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  // ---------- Theme toggle (persisted) ----------
+  var root = document.documentElement, KEY = 'on-theme';
+  function effective(){
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  } catch (e) {}
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    var next = effective() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+
+  // ---------- Scroll progress ----------
+  var bar = document.getElementById('progressBar');
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---------- Cold hand-off simulation ----------
+  var wrong = [
+    ['configure.sh',  'bad',  'FAIL', 'podman: command not found — nothing is installed yet.'],
+    ['final.sh',      'bad',  'RAN',  'Marked the deploy “complete” on a host with nothing on it.'],
+    ['fix-podman.sh', 'bad',  'FAIL', 'Patched a config file that doesn’t exist yet.'],
+    ['helper.sh',     'warn', '??',   'Meant to be sourced, not run. Executed anyway — side effects unknown.'],
+    ['install.sh',    'ok',   'OK',   'Finally installs packages, four steps too late.'],
+    ['install2.sh',   'warn', '??',   'Replacement or addition? It overwrote the package pins from install.sh.'],
+    ['setup.sh',      'bad',  'LATE', 'Creates the directories configure.sh needed six steps ago.'],
+    ['start.sh',      'bad',  'FAIL', 'Starts services against a half-written config.'],
+    ['verify.sh',     'warn', 'PASS?','Checks what exists, not what was intended. False confidence.']
+  ];
+  var right = [
+    ['00-check-prereqs.sh',    'ok',   'OK',   'Host prerequisites checked before package installation.'],
+    ['01-create-dirs.sh',      'ok',   'OK',   'Directories exist before anything writes to them.'],
+    ['02-install-packages.sh', 'ok',   'OK',   'Pinned packages installed once.'],
+    ['03-configure-podman.sh', 'ok',   'OK',   'Configures software that is now installed.'],
+    ['04-write-quadlets.sh',   'ok',   'OK',   'Writes Quadlet definitions, including [Install] when automatic startup is required.'],
+    ['05-start-services.sh',   'ok',   'OK',   'reload systemd and start the generated units.'],
+    ['06-verify.sh',           'ok',   'PASS', 'Exits 0 only if every check passes. Hand-off gate.'],
+    ['99-rollback.sh',         'skip', 'SKIP', 'Manual only. The runner executes pipeline prefixes 00–89.'],
+    ['run-all.sh',             'skip', 'ENTRY','The entry point you invoked; not part of the glob.']
+  ];
+
+  function render(listEl, data){
+    listEl.innerHTML = '';
+    data.forEach(function(r){
+      var li = document.createElement('li');
+      var name = document.createElement('span'); name.textContent = r[0];
+      var st = document.createElement('span'); st.className = 'st'; st.textContent = '';
+      var why = document.createElement('span'); why.className = 'why'; why.textContent = r[3];
+      li.appendChild(name); li.appendChild(st); li.appendChild(why);
+      listEl.appendChild(li);
+    });
+    listEl.classList.remove('ran');
+  }
+  var wl = document.getElementById('wrongList'), rl = document.getElementById('rightList');
+  var wv = document.getElementById('wrongVerdict'), rv = document.getElementById('rightVerdict');
+  var timers = [];
+  function reset(){
+    timers.forEach(clearTimeout); timers = [];
+    render(wl, wrong); render(rl, right);
+    wv.textContent = 'Not yet run.'; rv.textContent = 'Not yet run.';
+    wv.style.color = ''; rv.style.color = '';
+  }
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function run(){
+    reset();
+    wl.classList.add('ran'); rl.classList.add('ran');
+    var delay = reduce ? 0 : 260;
+    var max = Math.max(wrong.length, right.length);
+    for (var i = 0; i < max; i++){
+      (function(i){
+        timers.push(setTimeout(function(){
+          if (wrong[i]) { var s = wl.children[i].querySelector('.st'); s.className = 'st ' + wrong[i][1]; s.textContent = wrong[i][2]; }
+          if (right[i]) { var t = rl.children[i].querySelector('.st'); t.className = 'st ' + right[i][1]; t.textContent = right[i][2]; }
+        }, i * delay));
+      })(i);
+    }
+    timers.push(setTimeout(function(){
+      wv.textContent = 'Broken host, false “pass”, and no way to know the intended order without the original author.';
+      wv.style.color = 'var(--bad)';
+      rv.textContent = 'Illustrative sequence completed. Real host readiness still requires recorded verification evidence.';
+      rv.style.color = 'var(--ok)';
+    }, max * delay));
+  }
+  document.getElementById('simBtn').addEventListener('click', run);
+  document.getElementById('simReset').addEventListener('click', reset);
+  reset();
+
+  // ---------- Factorial calculator ----------
+  var range = document.getElementById('nRange'), nVal = document.getElementById('nVal'), wc = document.getElementById('wrongCount');
+  function fact(n){ var r = BigInt(1); for (var i = 2; i <= n; i++) r *= BigInt(i); return r; }
+  function upd(){
+    var n = parseInt(range.value, 10);
+    nVal.textContent = n;
+    var f;
+    try { f = fact(n).toLocaleString('en-US'); } catch(e){ var x = 1; for (var i = 2; i <= n; i++) x *= i; f = x.toLocaleString('en-US'); }
+    wc.textContent = f;
+  }
+  range.addEventListener('input', upd); upd();
+
+  // ---------- Copy button ----------
+  document.querySelectorAll('.copybtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var text = document.getElementById(b.getAttribute('data-copy')).innerText;
+      function done(ok){ b.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function(){ b.textContent = 'Copy'; }, 1800); }
+      function fallback(){
+        try {
+          var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select(); var ok = document.execCommand('copy'); document.body.removeChild(ta); done(ok);
+        } catch(e){ done(false); }
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ done(true); }, fallback);
+        } else { fallback(); }
+      } catch(e){ fallback(); }
+    });
+  });
+
+  // ---------- Checklist progress ----------
+  var boxes = document.querySelectorAll('#checklist input'), prog = document.getElementById('progress');
+  function prg(){
+    var c = 0; boxes.forEach(function(b){ if (b.checked) c++; });
+    prog.textContent = c + ' of ' + boxes.length + ' complete' + (c === boxes.length ? ' — ready for hand-off' : '');
+    prog.classList.toggle('done', c === boxes.length);
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', prg); }); prg();
+
+  // ---------- Rail highlight ----------
+  var links = document.querySelectorAll('#railList a');
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id); });
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    document.querySelectorAll('main section').forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
